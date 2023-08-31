@@ -1,0 +1,8 @@
+rootProject.name = 'OneRupee'
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+include ':app'
+includeBuild('../node_modules/@react-native/gradle-plugin')
+include ':react-native-camera'
+project(':react-native-camera').projectDir = new File(rootProject.projectDir,   '../node_modules/react-native-camera/android')
+include ':react-native-pay-by-upi'
+project(':react-native-pay-by-upi').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-pay-by-upi/android')
