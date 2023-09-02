@@ -12,18 +12,28 @@ import {ScreenProps} from '../../types/types';
 import {StackActions} from '@react-navigation/native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {loginWithEmail, onGoogleButtonPress} from './auth';
+import {backgroundColor, themeColor} from '../../constants';
+import {useAuth} from './authContext';
+import {setUpNewUser} from './utils';
 
 type LoginScreenProps = ScreenProps<'LoginScreen'>;
 
 const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
+  const [user, initilizing] = useAuth();
+  console.log('user ', user);
 
   const handleGoogleAuth = () => {
     onGoogleButtonPress()
-      .then(() => {
+      .then(userInfo => {
         console.log('Signed in with Google!');
-        navigation.dispatch(StackActions.replace('Home'));
+        if (!userInfo.additionalUserInfo?.isNewUser)
+          navigation.dispatch(StackActions.replace('Main'));
+        else {
+          console.log('creating new user');
+          navigation.dispatch(StackActions.replace('LoginSucess'));
+        }
       })
       .catch(() => {
         console.log('Error authenting google');
@@ -37,9 +47,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
         password,
         () => {
           console.log('success');
-          navigation.dispatch(StackActions.replace('Home'));
+          navigation.dispatch(StackActions.replace('Main'));
         },
-        fail => console.log('login failed', fail),
+        fail => console.log('login failed', fail), //error code should be found
       );
   };
 
@@ -54,6 +64,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
           <TextInput
             style={styles.textInput}
             placeholder="Username"
+            textContentType="emailAddress"
             value={email}
             onChangeText={text => {
               setEmail(text);
@@ -83,7 +94,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
             onPress={() => {
               navigation.navigate('SignUpScreen');
             }}>
-            <Text style={{color: 'blue'}}>Create a account</Text>
+            <Text style={{color: 'white'}}>Create a account</Text>
           </Pressable>
         </View>
         <View style={[styles.newAcc]}>
@@ -95,18 +106,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
             onPress={() => {
               navigation.navigate('ResetPassword');
             }}>
-            <Text style={{color: 'blue'}}>Reset Your password here</Text>
+            <Text style={{color: 'white'}}>Reset Your password here</Text>
           </Pressable>
         </View>
         <View style={styles.oauthContainer}>
           <Pressable onPress={handleGoogleAuth}>
-            <AntDesign name="google" color="blue" size={30} />
+            <AntDesign name="google" color="white" size={30} />
           </Pressable>
           <Pressable>
-            <AntDesign name="facebook-square" color="blue" size={30} />
+            <AntDesign name="facebook-square" color="white" size={30} />
           </Pressable>
           <Pressable>
-            <AntDesign name="windows" color="blue" size={30} />
+            <AntDesign name="windows" color="white" size={30} />
           </Pressable>
         </View>
       </View>
@@ -118,7 +129,7 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   text: {
-    color: 'black',
+    color: 'white',
     fontSize: 40,
   },
   container: {
@@ -126,11 +137,13 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: backgroundColor,
   },
   textInput: {
     borderWidth: 2,
     width: 300,
     height: 50,
+    color: 'white',
     marginBottom: 10,
     borderRadius: 10,
     paddingLeft: 10,
@@ -145,7 +158,7 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'blue',
+    backgroundColor: themeColor,
   },
   btnTextStyle: {
     color: 'white',

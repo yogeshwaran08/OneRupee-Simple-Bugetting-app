@@ -16,19 +16,32 @@ import SplashScreen from '../screens/SplashScreen';
 import LoginScreen from '../screens/AuthFlow/LoginScreen';
 import SignUpScreen from '../screens/AuthFlow/SignUpScreen';
 import ResetPassword from '../screens/AuthFlow/ResetPassword';
+import LoginSucess from '../screens/AuthFlow/LoginSucess';
+import {useAuth} from '../screens/AuthFlow/authContext';
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 const PaymentStack = createStackNavigator<RootStackParamList>();
 const SplashScreenStack = createStackNavigator<RootStackParamList>();
+const AuthFlowStack = createStackNavigator<RootStackParamList>();
 
 const SplashScreenNavigater = () => (
   <SplashScreenStack.Navigator screenOptions={{headerShown: false}}>
     <SplashScreenStack.Screen name="SplashScreen" component={SplashScreen} />
-    <SplashScreenStack.Screen name="LoginScreen" component={LoginScreen} />
-    <SplashScreenStack.Screen name="SignUpScreen" component={SignUpScreen} />
-    <SplashScreenStack.Screen name="ResetPassword" component={ResetPassword} />
+    <SplashScreenStack.Screen name="AuthFlow" component={AuthFlowNaivgator} />
     <SplashScreenStack.Screen name="Main" component={TabbedNavigator} />
   </SplashScreenStack.Navigator>
+);
+
+const AuthFlowNaivgator = () => (
+  <AuthFlowStack.Navigator
+    initialRouteName="LoginScreen"
+    screenOptions={{headerShown: false}}>
+    <AuthFlowStack.Screen name="LoginScreen" component={LoginScreen} />
+    <AuthFlowStack.Screen name="LoginSucess" component={LoginSucess} />
+    <AuthFlowStack.Screen name="SignUpScreen" component={SignUpScreen} />
+    <AuthFlowStack.Screen name="ResetPassword" component={ResetPassword} />
+    <AuthFlowStack.Screen name="Main" component={TabbedNavigator} />
+  </AuthFlowStack.Navigator>
 );
 
 const PaymentStackNavigator = () => (
@@ -97,6 +110,7 @@ const TabbedNavigator = () => (
 );
 
 const AppNavigator = () => {
+  const user = useAuth();
   return (
     <NavigationContainer>
       <SplashScreenNavigater />

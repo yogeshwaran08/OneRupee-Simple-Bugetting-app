@@ -15,7 +15,7 @@ export async function onGoogleButtonPress() {
   const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
   // Sign-in the user with the credential
-  return auth().signInWithCredential(googleCredential);
+  return (await auth().signInWithCredential(googleCredential));
 }
 
 

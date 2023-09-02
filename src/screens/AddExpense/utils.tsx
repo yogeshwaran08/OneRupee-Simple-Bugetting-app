@@ -72,11 +72,11 @@ export const getAddress = async (
   }
 };
 
-export const checkLastTransac = async () => {
+export const checkLastTransac = async (uid: string) => {
   const date = new Date().getDate().toString();
   const month = (new Date().getMonth() + 1).toString();
   const year = new Date().getFullYear().toString();
-  const lastTransactionDate = await getData('/user1/LastTransactionDate');
+  const lastTransactionDate = await getData(`/${uid}/LastTransactionDate`);
 
   const tempDateArr = lastTransactionDate.split('/');
 
@@ -85,25 +85,25 @@ export const checkLastTransac = async () => {
     tempDateArr[1] !== month ||
     tempDateArr[2] !== year
   ) {
-    await setData('/user1/LastTransactionDate', `${date}/${month}/${year}`);
-    await setData('/user1/noExpensesToday', 0);
-    await setData('/user1/noIncomeToday', 0);
+    await setData(`/${uid}/LastTransactionDate`, `${date}/${month}/${year}`);
+    await setData(`/${uid}/noExpensesToday`, 0);
+    await setData(`/${uid}/noIncomeToday`, 0);
   }
 };
 
-export const uploadData = async (data: uploadDataType) => {
+export const uploadData = async (uid: string, data: uploadDataType) => {
   const db = firebase.app().database(dbUrl);
-  db.ref(`/user1/${data.type}`).push(data);
-  await checkLastTransac();
+  db.ref(`/${uid}/${data.type}`).push(data);
+  await checkLastTransac(uid);
 
   if (data.type === 'income') {
     console.log('inside the income');
     try {
       const totalIncome: number = parseInt(data.amount.toString());
-      const currentIncome: number = await getData('/user1/totalIncome');
-      setData('/user1/totalIncome', totalIncome + currentIncome);
-      const transactionCount: number = await getData('/user1/noIncomeToday');
-      setData('/user1/noIncomeToday', transactionCount + 1);
+      const currentIncome: number = await getData(`/${uid}/totalIncome`);
+      setData(`/${uid}/totalIncome`, totalIncome + currentIncome);
+      const transactionCount: number = await getData(`/${uid}/noIncomeToday`);
+      setData(`/${uid}/noIncomeToday`, transactionCount + 1);
     } catch (e) {
       console.log('error occured', e);
     }
@@ -111,10 +111,10 @@ export const uploadData = async (data: uploadDataType) => {
     console.log('inside the expense');
     try {
       const totalExpense: number = parseInt(data.amount.toString());
-      const currentExpense: number = await getData('/user1/totalExpense');
-      setData('/user1/totalExpense', totalExpense + currentExpense);
-      const transactionCount: number = await getData('/user1/noExpensesToday');
-      setData('/user1/noExpensesToday', transactionCount + 1);
+      const currentExpense: number = await getData(`/${uid}/totalExpense`);
+      setData(`/${uid}/totalExpense`, totalExpense + currentExpense);
+      const transactionCount: number = await getData(`/${uid}/noExpensesToday`);
+      setData(`/${uid}/noExpensesToday`, transactionCount + 1);
     } catch (e) {
       console.log('error occured on adding expense', e);
     }

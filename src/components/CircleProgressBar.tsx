@@ -13,6 +13,7 @@ const CircularProgressBar: React.FC<Props> = ({
   expendedRupee,
   tintColor,
 }) => {
+  // console.log('cir ', typeof totalRupee, typeof expendedRupee);
   const fill = Math.round((expendedRupee / totalRupee) * 100);
   return (
     <View>

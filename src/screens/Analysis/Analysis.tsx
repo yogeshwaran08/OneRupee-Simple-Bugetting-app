@@ -20,14 +20,20 @@ import {
 } from './utils';
 import {ScreenProps, uploadDataType} from '../../types/types';
 import PopMessageBox from '../../components/PopupBox';
+import {StackActions, useIsFocused} from '@react-navigation/native';
+import {useAuth} from '../AuthFlow/authContext';
 
 type AnalysisProp = ScreenProps<'Analysis'>;
 
 const Analysis: React.FC<AnalysisProp> = ({navigation}) => {
+  const isFocused = useIsFocused();
   const [cardEvents, setCardEvents] = useState<uploadDataType[]>();
-  const [pieChartData, setPieChartdata] = useState<pieChartDataType[]>();
+  const [pieChartData, setPieChartdata] = useState<
+    pieChartDataType[] | null | undefined
+  >(undefined);
   const [refreshState, setRefreshStat] = useState<boolean>();
   const [showPopArray, setShowPopArray] = useState<boolean[]>([]);
+  const [user, initilizing] = useAuth();
 
   const handleChange = () => {
     setRefreshStat(!refreshState);
@@ -35,23 +41,30 @@ const Analysis: React.FC<AnalysisProp> = ({navigation}) => {
 
   useEffect(() => {
     const fetchdata = async () => {
-      try {
-        const sources = await getSources();
-        console.log('sources', sources);
-        if (sources) {
-          const clusterData = clusterDataByCategory(sources);
-          const piData = getPieChartData(clusterData);
-          console.log('pi data', piData);
-          setPieChartdata(piData);
+      if (user) {
+        try {
+          const sources = await getSources(user?.uid);
+          console.log('sources', sources);
+          if (sources) {
+            const clusterData = clusterDataByCategory(sources);
+            const piData = getPieChartData(clusterData);
+            // console.log('pi data', piData);
+            setPieChartdata(piData);
+          } else {
+            setPieChartdata(null);
+          }
+          setCardEvents(sources);
+        } catch (e) {
+          console.log(e);
+          throw e;
         }
-        setCardEvents(sources);
-      } catch (e) {
-        console.log(e);
-        throw e;
+      } else {
+        console.log('error in user');
+        navigation.dispatch(StackActions.replace(''));
       }
     };
     fetchdata();
-  }, [refreshState]);
+  }, [refreshState, isFocused, initilizing]);
 
   useEffect(() => {
     if (cardEvents) {
@@ -65,10 +78,12 @@ const Analysis: React.FC<AnalysisProp> = ({navigation}) => {
         <Text style={styles.headerText}>Analysis</Text>
       </View>
       <View>
-        {pieChartData ? (
-          <PieChartComponent data={pieChartData} />
+        {pieChartData === null ? (
+          <Text style={{color: 'white'}}>No data</Text>
+        ) : pieChartData === undefined ? (
+          <Text style={{color: 'white'}}>Loading...</Text>
         ) : (
-          <Text style={{color: 'white'}}>Loading....</Text>
+          <PieChartComponent data={pieChartData} />
         )}
       </View>
       <View style={styles.cardParent}>
@@ -124,7 +139,6 @@ const Analysis: React.FC<AnalysisProp> = ({navigation}) => {
           </ScrollView>
         </View>
       </View>
-      {/* <NavBar colors={['#fff', '#fff', themeColor]} /> */}
     </SafeAreaView>
   );
 };

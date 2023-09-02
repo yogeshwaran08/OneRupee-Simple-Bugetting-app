@@ -3,15 +3,23 @@ import React, {useEffect, useRef} from 'react';
 import {ScreenProps} from '../../types/types';
 import {backgroundColor, themeColor} from '../../constants';
 import {StackActions} from '@react-navigation/native';
+import {useAuth} from '../AuthFlow/authContext';
 
 type SplashScreenProps = ScreenProps<'SplashScreen'>;
 
 const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
+  const [user, initializing] = useAuth();
   useEffect(() => {
     setTimeout(() => {
-      navigation.dispatch(StackActions.replace('LoginScreen'));
+      if (!initializing) {
+        if (user === null)
+          navigation.dispatch(StackActions.replace('AuthFlow'));
+        else {
+          navigation.dispatch(StackActions.replace('Main'));
+        }
+      }
     }, 3000);
-  }, []);
+  }, [initializing]);
 
   return (
     <View style={styles.container}>

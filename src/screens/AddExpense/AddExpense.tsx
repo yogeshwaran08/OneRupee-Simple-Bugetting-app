@@ -11,7 +11,6 @@ import {
 import {
   colors,
   globalStyles,
-  pieCategories,
   incomeType,
   defaultDropdownValue,
 } from '../../constants';
@@ -23,6 +22,8 @@ import CustomButton from '../../components/CustomButton';
 
 import {ScreenProps, dropDownMenuType, uploadDataType} from '../../types/types';
 import {getAddress, getCategoryData, uploadData} from './utils';
+import {useAuth} from '../AuthFlow/authContext';
+import {StackActions} from '@react-navigation/native';
 
 type AddExpenseProps = ScreenProps<'AddExpense'>;
 
@@ -35,6 +36,7 @@ const AddExpense: React.FC<AddExpenseProps> = ({navigation}) => {
   const [categories, setCategories] = useState<dropDownMenuType[] | null>(null);
   const [address, setAddress] = useState<dropDownMenuType[]>();
   const [location, setLocation] = useState<string | null>('');
+  const [user, Initilizing] = useAuth();
 
   useEffect(() => {
     getAddress(data => {
@@ -68,7 +70,7 @@ const AddExpense: React.FC<AddExpenseProps> = ({navigation}) => {
 
       const data: uploadDataType = {
         timeStamp: timeStamp,
-        amount: amount,
+        amount: parseInt(amount.toString()),
         date: date,
         description: description,
         category: category,
@@ -78,7 +80,11 @@ const AddExpense: React.FC<AddExpenseProps> = ({navigation}) => {
         type: typeValue,
         location: location,
       };
-      await uploadData(data);
+      if (user) await uploadData(user.uid, data);
+      else {
+        console.log('error occured');
+        // navigation.dispatch(StackActions.replace('Login'));
+      }
       setAmount(0);
       setdescription('');
       setTypeValue(null);

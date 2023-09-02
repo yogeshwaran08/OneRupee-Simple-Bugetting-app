@@ -2,7 +2,7 @@ import { firebase } from "@react-native-firebase/database";
 import { dbUrl } from "../../constants";
 import { uploadDataType } from "../../types/types";
 
-const db = firebase.app().database(dbUrl)
+const db = firebase.app().database(dbUrl);
 
 interface temp {
   [key: string] : uploadDataType
@@ -62,67 +62,41 @@ export const pushData = (path : string, data : any) => {
     });
 }
 
-export const getTodayData = async (type: 'income' | 'expense', setFunc : React.Dispatch<React.SetStateAction<number>>): Promise<number> => {
-  const path = (type === "expense") ? "/user1/noExpensesToday" : "/user1/noIncomeToday";
-    let amount = 0;
-    // const noOfTransaction = await getData(path); // Assuming this returns the number of transactions
-
-    await new Promise<void>((resolve, reject) => {
-      getRealTimeData(path, async noOfTransaction => {
-        if(noOfTransaction != '0')
-        {
-        try {
-          amount = 0;
-          const todayData: temp = await getLimitingData(`/user1/${type}`, noOfTransaction);
-          console.log(type,noOfTransaction);
-          const values = Object.values(todayData);
-          const sortedData = values.sort((a, b) => b.timeStamp - a.timeStamp);
-
-          sortedData.forEach((item) => {
-            amount += parseInt(item.amount.toString(), 10); // Parse as base 10
-          });
-          setFunc(amount);
-          console.log("Total amount:", amount);
-          resolve();
-        } catch (error) {
-          reject(error);
-        }
-      }
-      else {
-        console.log("Found 0 for ",path,"setting zero")
-        setFunc(0)
-      }
-      });
-    });
-
-    return amount;
-};
-
-
-export const getTodayDataa = async (type: 'income' | 'expense'): Promise<number> => {
-  const path = (type === "expense") ? "/user1/noExpensesToday" : "/user1/noIncomeToday";
+export const getTodayDataa = async (uid : string,type: 'income' | 'expense'): Promise<number> => {
+  const path = (type === "expense") ? `/${uid}/noExpensesToday` : `/${uid}/noIncomeToday`;
   let amount = 0;
-
-  await getRealTimeData(path, async noOfTransaction => {
-        const todayData: temp = await getLimitingData(`/user1/${type}`, noOfTransaction);
+  const noOfTransaction = await getData(path);
+  // await getRealTimeData(path, async noOfTransaction => {
+    if (noOfTransaction != 0)
+    {
+        const todayData: temp = await getLimitingData(`/${uid}/${type}`, noOfTransaction);
         const values = Object.values(todayData);
         const sortedData = values.sort((a, b) => b.timeStamp - a.timeStamp);
         sortedData.forEach((item) => {
           amount += parseInt(item.amount.toString(), 10); // Parse as base 10
         });
-        console.log("Total amount:", amount);
-  });
+        // console.log("Total amount:", amount);
+      }
+      else{
+        console.log("Amount is 0 setting 0 for ",path)
+      }
+    // });
 
   return amount;
 }
 
-export const getRecentSortedData= async (setFunc : React.Dispatch<React.SetStateAction<any>>) => {
+export const getRecentSortedData= async (uid : string, setFunc : (data : any) => void) => {
   const noOfEvents = 10;
-  await getRealTimeData("/user1/noExpensesToday", async noOfTransaction => {
-    const todayData: temp = await getLimitingData(`/user1/expense`, noOfEvents);
-    const values = Object.values(todayData);
-    const sortedData = values.sort((a, b) => b.timeStamp - a.timeStamp);
-    setFunc(sortedData);
-});
-
+  // await getRealTimeData(`/${uid}/noExpensesToday`, async noOfTransaction => {
+    const recentData: temp = await getLimitingData(`/${uid}/expense`, noOfEvents);
+    if(recentData !== null)
+    {
+      const values = Object.values(recentData);
+      const sortedData = values.sort((a, b) => b.timeStamp - a.timeStamp);
+      setFunc(sortedData);
+    }
+    else {
+      setFunc(null);
+    } 
+// });
 }

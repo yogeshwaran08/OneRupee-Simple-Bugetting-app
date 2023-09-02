@@ -7,10 +7,9 @@ export type seperatedDataType = {
 
 export type ClusteredData = Record<string, uploadDataType[]>;
 
-export const getSources = async () => {
+export const getSources = async (uid : string) => {
     try{
-        // const incomeData = await getData("/user1/income");
-        const expenseData = await getData("/user1/expense");
+        const expenseData = await getData(`/${uid}/expense`);
 
         // const incomeValue :uploadDataType[] = Object.values(incomeData);
         const expenseValue :uploadDataType[] = Object.values(expenseData);

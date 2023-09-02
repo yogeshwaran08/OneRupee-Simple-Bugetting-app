@@ -1,35 +1,49 @@
-import {firebase} from '@react-native-firebase/database';
-import { dbUrl } from '../constants';
+import { firebase } from "@react-native-firebase/database";
+import { dbUrl } from "../constants";
 
-export const getData = () => {
-    //get data
+const db = firebase.app().database(dbUrl)
+
+
+export const getData = async (path : string) => {
+    const ref = db.ref(path);
+    return ref.once("value")
+      .then(snapshot => {
+        return snapshot.val();
+      })
+      .catch(error => {
+        console.error("An error occurred:", error);
+      });
+};
+
+export const setData = async(path : string, data : any) => {
+    const ref = await db.ref(path).set(data)
+    .then(success => {return true})
+    .catch(error => {
+        console.log("Error Occured on setting data" , error);
+        return false;
+    });
 }
 
-export const getTotalIncome = () => {
-    //get income
-}
+export const getRealTimeData = (path:string, callback : (data: any) => void) => {
+    return new Promise((resolve, reject) => {
+      const ref = db.ref(path)
+      ref.on("value", snapshot => {
+      const data = snapshot.val()
+      callback(data);
+      resolve("success")
+    })
+    })
+  }
 
-export const getTotalExpense= () => {
-    // get expense
-}
 
-export const getRecentEvents = () => {
-    //get recent events
-}
+  export const getLimitingData = async (path : string, numberOfData: number) => {
+    const ref = db.ref(path).limitToFirst(numberOfData);
+    return ref.once("value")
+      .then(snapshot => {
+        return snapshot.val();
+      })
+      .catch(error => {
+        console.error("An error occurred:", error);
+      });
+  };
 
-export const getExpenses = () => {
-    //get expenses
-}
-
-export const pushData = (path : string, data : string) => {
-    const db = firebase
-    .app()
-    .database(dbUrl);
-    const ref = db.ref(path).push(data);
-    return ref.key;
-}
-
-//handle user input
-const setUserInput = () => {
-    
-}

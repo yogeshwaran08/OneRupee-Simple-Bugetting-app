@@ -7,9 +7,14 @@
 
 import React from 'react';
 import AppNavigator from './src/navigation';
+import {AuthContextProvier} from './src/screens/AuthFlow/authContext';
 
 function App(): JSX.Element {
-  return <AppNavigator />;
+  return (
+    <AuthContextProvier>
+      <AppNavigator />
+    </AuthContextProvier>
+  );
 }
 
 export default App;

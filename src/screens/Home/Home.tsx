@@ -4,54 +4,75 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  SafeAreaView,
   Pressable,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {backgroundColor, dbUrl, themeColor} from '../../constants';
+import {
+  backgroundColor,
+  dbUrl,
+  incomeCategories,
+  themeColor,
+} from '../../constants';
 import CircularProgressBar from '../../components/CircleProgressBar';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import EventCard from '../../components/EventCard';
-import {firebase} from '@react-native-firebase/database';
-import {getRealTimeData, getRecentSortedData, getTodayData} from './funcs';
+import {
+  getData,
+  getRealTimeData,
+  getRecentSortedData,
+  getTodayDataa,
+} from './funcs';
 import {ScreenProps, uploadDataType} from '../../types/types';
 import {checkLastTransac} from '../AddExpense/utils';
 import {capitalize} from '../../utils/generalUtils';
 import PopMessageBox from '../../components/PopupBox';
+import {useAuth} from '../AuthFlow/authContext';
+import {useIsFocused} from '@react-navigation/native';
+// import {SafeAreaView} from 'react-native-safe-area-context';
 
 type HomeScreenProps = ScreenProps<'Home'>;
 
 const Home: React.FC<HomeScreenProps> = ({navigation}) => {
-  const db = firebase.app().database(dbUrl);
-  const [totalIncome, setTotalIncome] = useState<number | null>(null);
-  const [totalExpense, setTotalExpense] = useState<number | null>(null);
-  const [todayExpense, setTodayExpense] = useState(0);
-  const [todayIncome, setTodayIncome] = useState(0);
-  const [events, setEvents] = useState<uploadDataType[] | void>();
+  const [user, initializing] = useAuth();
+  console.log('home user ', initializing);
+  const isFocused = useIsFocused();
+  const [totalIncome, setTotalIncome] = useState<number>();
+  const [totalExpense, setTotalExpense] = useState<number>();
+  const [todayExpense, setTodayExpense] = useState<number>();
+  const [todayIncome, setTodayIncome] = useState<number>();
+  const [events, setEvents] = useState<uploadDataType[] | null | undefined>(
+    undefined,
+  );
   const [showPopArray, setShowPopArray] = useState<boolean[]>([]);
   const tintColor: string = themeColor;
 
   useEffect(() => {
-    checkLastTransac();
-    getRecentSortedData(setEvents);
     const fnc = async () => {
-      let income = 0;
-      await getRealTimeData('/user1/totalIncome', data => {
-        income = data;
-        setTotalIncome(data);
-      });
-      await getRealTimeData('/user1/totalExpense', data => {
-        const availableAmount = parseInt(income.toString()) - data;
+      if (user) {
+        checkLastTransac(user.uid);
+        getRecentSortedData(user.uid, data => setEvents(data));
+
+        const income = await getData(`/${user.uid}/totalIncome`);
+        setTotalIncome(income);
+
+        const expense = await getData(`/${user.uid}/totalExpense`);
+        const availableAmount = parseInt(income.toString()) - expense;
         setTotalExpense(availableAmount);
-      });
 
-      await getTodayData('expense', setTodayExpense);
+        const tincome = await getTodayDataa(user.uid, 'income');
+        setTodayIncome(tincome);
 
-      await getTodayData('income', setTodayIncome);
+        const texpense = await getTodayDataa(user.uid, 'expense');
+        setTodayExpense(texpense);
+      } else {
+        console.log('User Logged out');
+      }
     };
 
     fnc();
-  }, []);
+  }, [isFocused, user]);
 
   useEffect(() => {
     if (events) {
@@ -59,13 +80,17 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
     }
   }, [events]);
 
+  // useEffect(() => {
+  //   if (isFocused) console.log('focus chagend');
+  // }, [isFocused]);
+
   return (
-    <View>
+    <SafeAreaView>
       <View style={styles.container}>
         <View style={styles.headingContainer}>
           <Text style={styles.header}>One Rupee</Text>
           <View style={{paddingTop: 50, paddingBottom: 10}}>
-            {totalIncome && totalExpense ? (
+            {totalIncome !== undefined && totalExpense !== undefined ? (
               <CircularProgressBar
                 totalRupee={parseInt(totalIncome.toString())}
                 expendedRupee={parseInt(totalExpense.toString())}
@@ -141,15 +166,15 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
                   </Pressable>
                 ))
               ) : (
-                <Text style={{color: 'white', fontSize: 14}}>
-                  Loading cards...
-                </Text>
+                <View style={styles.dataNotFound}>
+                  <Text style={styles.dataNotFoundText}>No data Found</Text>
+                </View>
               )}
             </ScrollView>
           </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -231,6 +256,16 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     paddingTop: 15,
+  },
+  dataNotFound: {
+    height: '40%',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dataNotFoundText: {
+    color: 'gray',
+    fontSize: 20,
   },
 });
 

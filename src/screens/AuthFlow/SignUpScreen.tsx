@@ -11,6 +11,10 @@ import React, {useState} from 'react';
 import {ScreenProps} from '../../types/types';
 import {StackActions} from '@react-navigation/native';
 import {signUpWithEmail} from './auth';
+import {backgroundColor, themeColor} from '../../constants';
+import InputBox from '../../components/InputBox';
+import {setUpNewUser} from './utils';
+import {useAuth} from './authContext';
 
 type SignUpScreenProps = ScreenProps<'SignUpScreen'>;
 
@@ -18,6 +22,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({navigation}) => {
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
   const [cnfPassword, setCnfPassword] = useState<string>();
+  const [errorState, setErrorState] = useState<string>();
 
   const handleBtnClick = () => {
     if (email && password && cnfPassword && password === cnfPassword) {
@@ -27,12 +32,16 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({navigation}) => {
 
   const successCallback = () => {
     console.log('Account created');
-    navigation.dispatch(StackActions.replace('Home'));
+    navigation.navigate('LoginSucess');
   };
 
   const failedCallback = (e: any) => {
-    console.log('error', e);
+    console.log('error', e.code);
+    if (e.code === 'auth/email-already-in-use') {
+      setErrorState('Email Already in use');
+    }
   };
+
   const handleLoginClick = () => {
     navigation.navigate('LoginScreen');
   };
@@ -57,28 +66,37 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({navigation}) => {
       <View style={styles.container}>
         <Text style={styles.text}>Sign up</Text>
         <View style={styles.dataContainer}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Username"
-            value={email}
-            onChangeText={handleEmailOnChange}
-          />
-          <TextInput
-            value={password}
-            style={styles.textInput}
-            placeholder="Password"
-            onChangeText={handlePasswordOnChange}
-          />
-          <TextInput
-            value={cnfPassword}
-            style={styles.textInput}
-            placeholder="Retype Password"
-            onChangeText={handleCnfPasswordOnChange}
-          />
+          <View style={{paddingVertical: 10}}>
+            <InputBox
+              text={email}
+              placeholder="Email"
+              type="email"
+              iconName="user"
+              setText={handleEmailOnChange}
+            />
+          </View>
+          <View style={{paddingVertical: 10}}>
+            <InputBox
+              text={password}
+              placeholder="Password"
+              type="text"
+              iconName="user"
+              setText={handlePasswordOnChange}
+            />
+          </View>
+          <View style={{paddingVertical: 10}}>
+            <InputBox
+              iconName="user"
+              type="text"
+              text={cnfPassword}
+              placeholder="Retype Password"
+              setText={handleCnfPasswordOnChange}
+            />
+          </View>
           <View style={{display: 'flex', flexDirection: 'row'}}>
-            <Text>Already have a account?</Text>
+            <Text style={{color: 'white'}}>Already have a account?</Text>
             <Pressable style={{paddingLeft: 5}} onPress={handleLoginClick}>
-              <Text style={{color: 'blue'}}>Click Here to Login</Text>
+              <Text style={{color: themeColor}}>Click Here to Login</Text>
             </Pressable>
           </View>
         </View>
@@ -96,12 +114,13 @@ export default SignUpScreen;
 
 const styles = StyleSheet.create({
   text: {
-    color: 'black',
+    color: 'white',
     fontSize: 40,
   },
   container: {
     height: '100%',
     width: '100%',
+    backgroundColor: backgroundColor,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -124,18 +143,16 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'blue',
+    backgroundColor: themeColor,
   },
   btnTextStyle: {
     color: 'white',
     fontSize: 20,
   },
   textInput: {
-    borderWidth: 2,
+    borderColor: 'white',
     width: 300,
     height: 50,
-    marginBottom: 10,
     borderRadius: 10,
-    paddingLeft: 10,
   },
 });

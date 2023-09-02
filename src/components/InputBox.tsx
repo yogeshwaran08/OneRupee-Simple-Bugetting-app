@@ -19,7 +19,7 @@ interface Props extends TextInputProps {
     | 'url';
   // text: string | number;
   // setText: React.Dispatch<React.SetStateAction<string | number>>;
-  text: string;
+  text: string | undefined;
   setText: any;
 }
 
