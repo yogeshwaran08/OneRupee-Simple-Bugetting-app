@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, TouchableWithoutFeedback, StyleSheet} from 'react-native';
+import {View, TouchableWithoutFeedback} from 'react-native';
 import {Svg, Path, Circle} from 'react-native-svg';
 
 interface DataItem {
@@ -15,7 +15,6 @@ const PieChart: React.FC<PieChartProps> = ({data}) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   let startAngle = 0;
   let endAngle = 0;
-  console.log('len ', data.length);
 
   return (
     <View style={{alignItems: 'center', justifyContent: 'center'}}>

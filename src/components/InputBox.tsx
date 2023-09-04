@@ -1,5 +1,11 @@
 import React, {useState, useRef} from 'react';
-import {View, TextInput, StyleSheet, TextInputProps} from 'react-native';
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  TextInputProps,
+  ViewStyle,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {colors} from '../constants';
 
@@ -17,10 +23,10 @@ interface Props extends TextInputProps {
     | 'search'
     | 'email'
     | 'url';
-  // text: string | number;
-  // setText: React.Dispatch<React.SetStateAction<string | number>>;
   text: string | undefined;
-  setText: any;
+  setText: (a: string) => void;
+  containerStyle?: ViewStyle;
+  secureTextEntry?: boolean;
 }
 
 const InputBox: React.FC<Props> = ({
@@ -31,23 +37,20 @@ const InputBox: React.FC<Props> = ({
   setText,
   text,
   type,
+  containerStyle,
   ...rest
 }) => {
   return (
-    <View style={styles.inputContainer}>
-      <Icon
-        name={iconName}
-        size={20}
-        color={colors.iconColor}
-        style={styles.icon}
-      />
+    <View style={[styles.inputContainer, containerStyle]}>
+      <Icon name={iconName} size={20} color={'gray'} style={styles.icon} />
       <TextInput
         style={[styles.input, {height: height}]}
-        onChangeText={setText}
+        onChangeText={text => setText(text)}
         value={text}
         inputMode={type}
         multiline={multiline}
         placeholder={placeholder}
+        secureTextEntry={true}
         placeholderTextColor={colors.placeholder}
         {...rest}
       />
@@ -60,16 +63,18 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.inputFieldColor, // Glass effect with transparency
-    borderRadius: 10,
-    paddingVertical: 8,
+    paddingVertical: 3,
     paddingHorizontal: 12,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    borderColor: 'black',
+    borderWidth: 1,
   },
   input: {
     flex: 1,
-    color: colors.primaryForeground,
-    fontSize: 18,
-    marginLeft: 8,
+    fontFamily: 'Poppins-Regular',
+    color: 'black',
+    fontSize: 15,
   },
   icon: {
     marginRight: 8,

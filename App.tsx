@@ -8,11 +8,14 @@
 import React from 'react';
 import AppNavigator from './src/navigation';
 import {AuthContextProvier} from './src/screens/AuthFlow/authContext';
+import {ToastProvider} from 'react-native-toast-notifications';
 
 function App(): JSX.Element {
   return (
     <AuthContextProvier>
-      <AppNavigator />
+      <ToastProvider>
+        <AppNavigator />
+      </ToastProvider>
     </AuthContextProvier>
   );
 }
