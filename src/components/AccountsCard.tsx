@@ -1,6 +1,7 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import Octicons from 'react-native-vector-icons/Octicons';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface Props {
   description: string;
@@ -18,7 +19,11 @@ const AccountsCard: React.FC<Props> = ({
   location,
 }) => {
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#FF834C', '#FF834C']} // Define your gradient colors
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 0}}
+      style={styles.container}>
       <View style={styles.left}>
         <View
           style={{
@@ -40,17 +45,26 @@ const AccountsCard: React.FC<Props> = ({
                 styles.typeText,
                 {
                   color: 'white',
+                  fontFamily: 'Poppins-Bold',
                 },
               ]}>
               {title}
             </Text>
           </View>
-          <Text style={{color: 'white'}} numberOfLines={1}>
+          <Text
+            style={{color: 'white', fontFamily: 'Poppins-Regular'}}
+            numberOfLines={1}>
             Description : {description}
           </Text>
         </View>
         <View>
-          <Text style={{color: 'white', fontSize: 13}} numberOfLines={1}>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: 13,
+              fontFamily: 'Poppins-Regular',
+            }}
+            numberOfLines={1}>
             Location : {location}
           </Text>
         </View>
@@ -60,7 +74,7 @@ const AccountsCard: React.FC<Props> = ({
           {'-'}₹{amount}
         </Text>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -78,7 +92,7 @@ const styles = StyleSheet.create({
   left: {
     width: '70%',
     borderRightWidth: 2,
-    borderColor: 'gray',
+    borderColor: 'white',
     display: 'flex',
     flexDirection: 'column',
   },
@@ -96,10 +110,9 @@ const styles = StyleSheet.create({
   },
   typeText: {
     fontSize: 16,
-    fontWeight: '800',
   },
   amount: {
     fontSize: 20,
-    fontWeight: '600',
+    fontFamily: 'Poppins-Regular',
   },
 });

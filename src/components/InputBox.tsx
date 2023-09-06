@@ -6,12 +6,12 @@ import {
   TextInputProps,
   ViewStyle,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import {colors} from '../constants';
 
 interface Props extends TextInputProps {
   placeholder: string;
-  iconName: string;
+  // iconName: string;
+  iconName: () => JSX.Element;
   height?: number;
   multiline?: boolean;
   type:
@@ -38,11 +38,13 @@ const InputBox: React.FC<Props> = ({
   text,
   type,
   containerStyle,
+  secureTextEntry,
   ...rest
 }) => {
   return (
     <View style={[styles.inputContainer, containerStyle]}>
-      <Icon name={iconName} size={20} color={'gray'} style={styles.icon} />
+      {/* <Icon name={iconName} size={20} color={'gray'} style={styles.icon} /> */}
+      {iconName()}
       <TextInput
         style={[styles.input, {height: height}]}
         onChangeText={text => setText(text)}
@@ -50,7 +52,7 @@ const InputBox: React.FC<Props> = ({
         inputMode={type}
         multiline={multiline}
         placeholder={placeholder}
-        secureTextEntry={true}
+        secureTextEntry={secureTextEntry}
         placeholderTextColor={colors.placeholder}
         {...rest}
       />

@@ -22,7 +22,7 @@ const CircularProgressBar: React.FC<Props> = ({
         width={15}
         backgroundWidth={10}
         fill={fill}
-        tintColor={tintColor}
+        tintColor={'#FF5733'}
         backgroundColor="#D9D9D9"
         arcSweepAngle={300}
         rotation={210}
@@ -45,14 +45,14 @@ export default CircularProgressBar;
 const styles = StyleSheet.create({
   header: {
     textAlign: 'center',
-    color: '#fff',
-    fontSize: 50,
-    fontWeight: '700',
+    color: '#000',
+    fontSize: 40,
+    fontFamily: 'Poppins-Bold',
   },
   subHeader: {
     textAlign: 'center',
-    color: '#A3A3A3',
+    color: 'black',
     fontSize: 18,
-    fontWeight: '300',
+    fontFamily: 'Poppins-Regular',
   },
 });

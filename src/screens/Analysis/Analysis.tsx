@@ -22,6 +22,8 @@ import {ScreenProps, uploadDataType} from '../../types/types';
 import PopMessageBox from '../../components/PopupBox';
 import {StackActions, useIsFocused} from '@react-navigation/native';
 import {useAuth} from '../AuthFlow/authContext';
+import Header from '../../components/Header';
+import LinearGradient from 'react-native-linear-gradient';
 
 type AnalysisProp = ScreenProps<'Analysis'>;
 
@@ -73,20 +75,33 @@ const Analysis: React.FC<AnalysisProp> = ({navigation}) => {
   }, [cardEvents]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Analysis</Text>
-      </View>
-      <View>
+    <LinearGradient
+      style={styles.container}
+      colors={['rgba(250,167,62, 0.2)', '#fff', 'rgba(250, 167, 62, 0.2)']}
+      start={{x: 1, y: 0}}
+      end={{x: 0, y: 1}}>
+      <Header scrnName="Analysis" />
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '35%',
+          // backgroundColor: 'black',
+        }}>
         {pieChartData === null ? (
-          <Text style={{color: 'white'}}>No data</Text>
+          <Text style={{color: 'black'}}>No data</Text>
         ) : pieChartData === undefined ? (
           <Text style={{color: 'white'}}>Loading...</Text>
         ) : (
           <PieChartComponent data={pieChartData} />
         )}
       </View>
-      <View style={styles.cardParent}>
+
+      <LinearGradient
+        style={styles.cardParent}
+        colors={['rgba(250,167,62, 0.5)', 'rgba(250,167,62, 0.5)']}
+        start={{x: 1, y: 0}}
+        end={{x: 0, y: 1}}>
         <View style={styles.cardContainer}>
           <View style={styles.srcHeader}>
             <Text style={styles.cardHeader}>Sources</Text>
@@ -98,14 +113,16 @@ const Analysis: React.FC<AnalysisProp> = ({navigation}) => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <Text style={{color: themeColor, fontSize: 15, paddingRight: 5}}>
+              <Text
+                style={{
+                  color: 'gray',
+                  fontSize: 15,
+                  paddingRight: 5,
+                  fontFamily: 'Poppins-Regular',
+                }}>
                 Refresh
               </Text>
-              <MaterialCommunityIcons
-                name="restore"
-                color={themeColor}
-                size={20}
-              />
+              <MaterialCommunityIcons name="restore" color={'gray'} size={20} />
             </Pressable>
           </View>
           <ScrollView style={styles.scrollableContainer}>
@@ -138,8 +155,8 @@ const Analysis: React.FC<AnalysisProp> = ({navigation}) => {
             ))}
           </ScrollView>
         </View>
-      </View>
-    </SafeAreaView>
+      </LinearGradient>
+    </LinearGradient>
   );
 };
 
@@ -147,7 +164,7 @@ export default Analysis;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: backgroundColor,
+    backgroundColor: 'white',
     height: '100%',
   },
   headerText: {
@@ -163,18 +180,21 @@ const styles = StyleSheet.create({
   },
   cardParent: {
     flex: 1,
+    borderWidth: 1,
+    borderColor: 'black',
     alignItems: 'center',
-    backgroundColor: '#202020',
-    marginTop: 30,
+    backgroundColor: 'white',
+    // marginTop: 30,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    height: '100%',
     // marginBottom: 60,
     // marginBottom: '15%',
   },
   cardHeader: {
-    color: 'white',
+    color: 'black',
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins-SemiBold',
   },
   srcHeader: {
     display: 'flex',

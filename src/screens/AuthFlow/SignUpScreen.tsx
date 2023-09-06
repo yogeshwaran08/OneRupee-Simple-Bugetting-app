@@ -26,6 +26,7 @@ import {
 import {useToast} from 'react-native-toast-notifications';
 import {loginWithEmail, onGoogleButtonPress, signUpWithEmail} from './auth';
 import {StackActions} from '@react-navigation/native';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 type LoginScreenProps = ScreenProps<'SignUpScreen'>;
 
@@ -79,10 +80,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
       message = 'Email address already in use';
     } else if (e.code === 'auth/invalid-email') {
       message = 'Please enter a valid email address';
-    } else if (e.code === 'auth/weak-password') {
+    } else if (e.code === 'auth/`weak-password') {
       message = 'The password is too weak';
     } else if (e.code === 'too-many-requests') {
       message = 'Too many request please try again later';
+    } else if (e.code === 'auth/network-request-failed') {
+      message = 'Network Failed';
     }
     toast.show(message, {
       type: 'warning',
@@ -141,7 +144,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
             <View style={styles.inputContainer}>
               <Animated.View style={animatedStyle}>
                 <InputBox
-                  iconName="user"
+                  iconName={() => {
+                    return (
+                      <SimpleLineIcons
+                        name="envelope-letter"
+                        color={'gray'}
+                        size={30}
+                      />
+                    );
+                  }}
                   placeholder="Email"
                   multiline={false}
                   text={email}
@@ -154,7 +165,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
               </Animated.View>
               <Animated.View style={animatedStyle}>
                 <InputBox
-                  iconName="lock"
+                  iconName={() => {
+                    return (
+                      <SimpleLineIcons name="lock" color={'gray'} size={30} />
+                    );
+                  }}
                   placeholder="Password"
                   secureTextEntry={true}
                   multiline={false}
@@ -169,7 +184,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
 
               <Animated.View style={animatedStyle}>
                 <InputBox
-                  iconName="lock"
+                  iconName={() => {
+                    return (
+                      <SimpleLineIcons name="lock" color={'gray'} size={30} />
+                    );
+                  }}
                   placeholder="Confirm password"
                   secureTextEntry={true}
                   multiline={false}

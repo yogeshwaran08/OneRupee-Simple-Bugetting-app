@@ -2,26 +2,29 @@ import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Entypo from 'react-native-vector-icons/Entypo';
+import LinearGradient from 'react-native-linear-gradient';
+import {uploadDataType} from '../types/types';
 
-interface Props {
-  type: 'income' | 'expense';
-  category: string;
-  amount: number;
-  location: string;
+interface eventProps {
+  item: uploadDataType;
 }
 
-const EventCard: React.FC<Props> = ({type, category, amount, location}) => {
+const EventCard: React.FC<eventProps> = ({item}) => {
   // const color = type === 'income' ? 'green' : 'red';
   const color = 'red';
   return (
-    <View style={styles.cardContainer}>
+    <LinearGradient
+      colors={['#FF834C', '#FF834C']} // Define your gradient colors
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 0}}
+      style={styles.cardContainer}>
       <View>
         <Fontisto name="money-symbol" size={40} color={color} />
       </View>
 
       <View style={styles.dataContainer}>
-        <Text style={styles.category}>{category}</Text>
-        <Text style={styles.amount}>₹{amount}</Text>
+        <Text style={styles.category}>{item.category}</Text>
+        <Text style={styles.amount}>₹{item.amount}</Text>
         <View
           style={{
             display: 'flex',
@@ -31,12 +34,18 @@ const EventCard: React.FC<Props> = ({type, category, amount, location}) => {
             width: '95%',
           }}>
           <Entypo name={'location-pin'} color={'white'} size={12} />
-          <Text style={{color: 'white', fontSize: 12}} numberOfLines={1}>
-            {location}
+          <Text
+            style={{
+              color: 'white',
+              fontSize: 12,
+              fontFamily: 'Poppins-Regular',
+            }}
+            numberOfLines={1}>
+            {item.location}
           </Text>
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -54,15 +63,17 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     paddingLeft: 5,
     paddingBottom: 20,
+    marginRight: 15,
   },
   category: {
-    color: '#C6C6C6',
+    color: 'white',
     fontSize: 13,
     paddingBottom: 5,
+    fontFamily: 'Poppins-Regular',
   },
   amount: {
     color: 'white',
-    fontWeight: '600',
+    fontFamily: 'Poppins-Regular',
     fontSize: 22,
   },
   dataContainer: {

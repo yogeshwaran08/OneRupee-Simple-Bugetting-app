@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, ViewStyle} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {colors} from '../constants';
@@ -8,10 +8,11 @@ import {categoryComponentType} from '../types/types';
 interface Props {
   data: categoryComponentType[];
   value: string | null;
-  iconName: string;
+  iconName: () => JSX.Element;
   placeholder: string;
   setValue: (value: any) => void;
   disable?: boolean;
+  containerStyle?: ViewStyle;
 }
 
 const DropdownComponent: React.FC<Props> = ({
@@ -21,6 +22,7 @@ const DropdownComponent: React.FC<Props> = ({
   iconName,
   placeholder,
   disable = false,
+  containerStyle,
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -28,7 +30,7 @@ const DropdownComponent: React.FC<Props> = ({
   data = [{name: placeholder, codename: null}, ...data];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <Dropdown
         disable={disable}
         style={[styles.dropdown]}
@@ -52,14 +54,7 @@ const DropdownComponent: React.FC<Props> = ({
           setValue(item.codename);
           setIsFocus(false);
         }}
-        renderLeftIcon={() => (
-          <FontAwesome5
-            style={styles.icon}
-            color={colors.iconColor}
-            name={iconName}
-            size={20}
-          />
-        )}
+        renderLeftIcon={() => iconName()}
       />
     </View>
   );
@@ -69,15 +64,19 @@ export default DropdownComponent;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.inputFieldColor,
-    padding: 8,
+    backgroundColor: 'white',
+    padding: 3,
+    borderWidth: 1,
+    borderColor: 'black',
     width: '100%',
     borderRadius: 10,
   },
   containerStyle: {
     borderRadius: 10,
     width: '100%',
-    backgroundColor: colors.appBackgroundColor,
+    backgroundColor: 'gray',
+    borderWidth: 1,
+    borderColor: 'black',
   },
   itemContainerStyle: {
     backgroundColor: colors.inputFieldColor,
@@ -91,13 +90,14 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 15,
+    marginLeft: 8,
   },
   placeholderStyle: {
     color: colors.placeholder,
     fontSize: 18,
   },
   selectedTextStyle: {
-    color: colors.primaryForeground,
+    color: 'black',
     fontSize: 18,
   },
   iconStyle: {

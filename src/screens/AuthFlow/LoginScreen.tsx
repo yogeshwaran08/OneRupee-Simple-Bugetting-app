@@ -22,12 +22,12 @@ import {
   GestureDetector,
   Gesture,
   GestureHandlerRootView,
-  DrawerLayoutAndroid,
 } from 'react-native-gesture-handler';
 import {ToastProvider, useToast} from 'react-native-toast-notifications';
 import {SuccessToast} from 'react-native-toast-message';
 import {loginWithEmail, onGoogleButtonPress} from './auth';
 import {StackActions} from '@react-navigation/native';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 type LoginScreenProps = ScreenProps<'LoginScreen'>;
 
@@ -91,6 +91,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
             message = 'Cannot find the user with email provided';
           } else if (fail.code === 'auth/too-many-requests') {
             message = 'Too many request. Please try again after sometime';
+          } else if (fail.code === 'auth/network-request-failed') {
+            message = 'Network failed';
           } else {
             message = 'Error occured on signing in';
           }
@@ -166,7 +168,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
             </View>
             <Animated.View style={animatedStyle}>
               <InputBox
-                iconName="user"
+                iconName={() => {
+                  return (
+                    <SimpleLineIcons name="user" color={'gray'} size={25} />
+                  );
+                }}
                 placeholder="Email"
                 multiline={false}
                 text={email}
@@ -179,7 +185,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
             </Animated.View>
             <Animated.View style={animatedStyle}>
               <InputBox
-                iconName="lock"
+                iconName={() => {
+                  return (
+                    <SimpleLineIcons name="lock" color={'gray'} size={25} />
+                  );
+                }}
                 placeholder="Password"
                 secureTextEntry={true}
                 multiline={false}

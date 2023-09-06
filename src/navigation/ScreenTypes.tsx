@@ -15,6 +15,7 @@ export type RootStackParamList = {
   LoginSucess: undefined;
   AuthFlow: undefined;
   SplashScreenNaivgator: undefined;
+  LogoutScreen: undefined;
 
   //navigators
   PaymentInterfacenavigator: undefined;

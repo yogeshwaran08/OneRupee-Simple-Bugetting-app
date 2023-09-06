@@ -19,6 +19,12 @@ import {RootStackParamList} from '../../navigation/ScreenTypes';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {generateTransactionReference} from './utils';
+import {useAuth} from '../AuthFlow/authContext';
+import {useToast} from 'react-native-toast-notifications';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Entypo from 'react-native-vector-icons/Entypo';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import LinearGradient from 'react-native-linear-gradient';
 
 type PaymentScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'PaymentDetailCollector'>;
@@ -29,13 +35,15 @@ const PaymentDetailCollector: React.FC<PaymentScreenProps> = ({
   navigation,
   route,
 }) => {
-  const [amount, setAmount] = useState<number>(0);
+  const [amount, setAmount] = useState<string>('0');
   const [category, setCategory] = useState('');
   const [address, setAddress] = useState<dropDownMenuType[]>();
   const [location, setLocation] = useState<string | null>('');
   const [desc, setDesc] = useState<string>('');
   const [errorText, setErrorText] = useState<string | null>();
   const [categories, setCategories] = useState<dropDownMenuType[] | null>(null);
+  const [user, Initilizing] = useAuth();
+  const toast = useToast();
   const data = route.params;
   let payeeName = '';
   let payeeAddress = '';
@@ -74,7 +82,11 @@ const PaymentDetailCollector: React.FC<PaymentScreenProps> = ({
           transactionNote: desc,
         },
         async res => {
-          console.log('success', res);
+          toast.show('Success', {
+            type: 'success',
+            duration: 3000,
+            placement: 'top',
+          });
           const timeStamp = new Date().getTime();
           const date = new Date().getDate();
           const month = new Date().getMonth();
@@ -91,30 +103,48 @@ const PaymentDetailCollector: React.FC<PaymentScreenProps> = ({
             type: typeValue,
             location: location,
           };
-          await uploadData(data);
+          if (user) await uploadData(user.uid, data);
         },
         res => {
-          console.log('failed', res);
+          toast.show('error occured', {
+            type: 'warning',
+            duration: 3000,
+            placement: 'top',
+          });
         },
       );
     } catch (e) {
-      console.log('error ', e);
+      toast.show('Unknown error', {
+        type: 'error',
+        duration: 3000,
+        placement: 'top',
+      });
     }
   };
   const handleSubmit = () => {
-    console.log('asdasd');
-    if (amount == 0) {
-      setErrorText('Amount Cannot be 0');
+    if (amount == '0' || amount === null || amount === undefined) {
+      toast.show('Amount cannot be zero', {
+        type: 'warning',
+        duration: 3000,
+        placement: 'top',
+      });
     } else if (desc.trim() === '') {
-      setErrorText('Description cannot be empty');
+      toast.show('Description cannot be empty', {
+        type: 'warning',
+        duration: 3000,
+        placement: 'top',
+      });
     } else if (location === null) {
-      setErrorText('Please select a location');
+      toast.show('Please select a valid location', {
+        type: 'warning',
+        duration: 3000,
+        placement: 'top',
+      });
     } else {
-      setErrorText('Processing');
       handlePayment(
         payeeAddress,
         payeeName,
-        amount.toString(),
+        amount,
         desc,
         location,
         transactionId,
@@ -123,21 +153,32 @@ const PaymentDetailCollector: React.FC<PaymentScreenProps> = ({
   };
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={styles.parent}>
+      <LinearGradient
+        style={styles.parent}
+        colors={['rgba(250,167,62, 0.2)', '#fff', 'rgba(250, 167, 62, 0.2)']}
+        start={{x: 1, y: 0}}
+        end={{x: 0, y: 1}}>
         <View style={styles.container}>
           <View style={styles.headerContianer}>
-            <Text style={globalStyles.pageHeaderText}>
-              Paying to {payeeName}
-            </Text>
+            <Text style={styles.pageHeaderText}>Paying to {payeeName}</Text>
             <Text style={styles.subHeader}>with address of {payeeAddress}</Text>
           </View>
           <View style={styles.inputContainer}>
             <View style={styles.input}>
               <InputBox
                 placeholder="Amount to send"
-                iconName="money"
+                iconName={() => {
+                  return (
+                    <FontAwesome
+                      name="money"
+                      color={'gray'}
+                      size={20}
+                      style={{marginRight: 8}}
+                    />
+                  );
+                }}
                 multiline={false}
-                setText={setAmount}
+                setText={text => setAmount(text)}
                 text={amount.toString()}
                 type={'numeric'}
               />
@@ -149,7 +190,16 @@ const PaymentDetailCollector: React.FC<PaymentScreenProps> = ({
                   setValue={setCategory}
                   data={categories}
                   placeholder="Select Category"
-                  iconName="people-arrows"
+                  iconName={() => {
+                    return (
+                      <MaterialIcons
+                        name="category"
+                        color={'gray'}
+                        size={25}
+                        style={{paddingHorizontal: 5}}
+                      />
+                    );
+                  }}
                 />
               ) : (
                 <Droupdown
@@ -157,14 +207,32 @@ const PaymentDetailCollector: React.FC<PaymentScreenProps> = ({
                   setValue={setCategory}
                   data={defaultDropdownValue}
                   placeholder="Something went wrong"
-                  iconName="people-arrows"
+                  iconName={() => {
+                    return (
+                      <MaterialIcons
+                        name="category"
+                        color={'gray'}
+                        size={25}
+                        style={{paddingHorizontal: 5}}
+                      />
+                    );
+                  }}
                 />
               )}
             </View>
             <View style={styles.input}>
               <InputBox
                 placeholder="Description"
-                iconName="newspaper-o"
+                iconName={() => {
+                  return (
+                    <MaterialIcons
+                      name="description"
+                      size={20}
+                      color={'gray'}
+                      style={{marginVertical: 8}}
+                    />
+                  );
+                }}
                 multiline={true}
                 setText={setDesc}
                 text={desc}
@@ -180,7 +248,16 @@ const PaymentDetailCollector: React.FC<PaymentScreenProps> = ({
                   setValue={setLocation}
                   data={address}
                   placeholder="Location"
-                  iconName="search-location"
+                  iconName={() => {
+                    return (
+                      <Entypo
+                        name="location-pin"
+                        color={'gray'}
+                        size={25}
+                        style={{paddingHorizontal: 5}}
+                      />
+                    );
+                  }}
                 />
               ) : (
                 <Droupdown
@@ -189,7 +266,16 @@ const PaymentDetailCollector: React.FC<PaymentScreenProps> = ({
                   setValue={setCategory}
                   data={defaultDropdownValue}
                   placeholder="Gathering Locations..."
-                  iconName="search-location"
+                  iconName={() => {
+                    return (
+                      <Entypo
+                        name="location-pin"
+                        color={'gray'}
+                        size={25}
+                        style={{paddingHorizontal: 5}}
+                      />
+                    );
+                  }}
                 />
               )}
             </View>
@@ -199,7 +285,7 @@ const PaymentDetailCollector: React.FC<PaymentScreenProps> = ({
             </View>
           </View>
         </View>
-      </View>
+      </LinearGradient>
     </TouchableWithoutFeedback>
   );
 };
@@ -208,12 +294,13 @@ export default PaymentDetailCollector;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: backgroundColor,
+    backgroundColor: 'transparent',
     height: '100%',
     width: '90%',
   },
   subHeader: {
-    color: 'white',
+    fontFamily: 'Poppins-Regular',
+    color: 'black',
     paddingTop: 10,
   },
   headerContianer: {
@@ -225,7 +312,7 @@ const styles = StyleSheet.create({
   parent: {
     width: '100%',
     height: '100%',
-    backgroundColor: backgroundColor,
+    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -246,5 +333,10 @@ const styles = StyleSheet.create({
   errorMessageStyle: {
     color: 'red',
     paddingBottom: 20,
+  },
+  pageHeaderText: {
+    color: 'black',
+    fontFamily: 'Poppins-Bold',
+    fontSize: 20,
   },
 });

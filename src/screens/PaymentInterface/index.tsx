@@ -6,6 +6,8 @@ import {RNCamera} from 'react-native-camera';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../navigation/ScreenTypes';
+import LinearGradient from 'react-native-linear-gradient';
+import Header from '../../components/Header';
 
 // iconname - for which
 // flash-off - flash off
@@ -87,10 +89,12 @@ const PaymentInterface: React.FC<PaymentScreenProps> = ({navigation}) => {
 
   const flashMode = flashModes[flashModeIndex];
   return (
-    <View style={styles.container}>
-      <View style={styles.headerStyle}>
-        <Text style={globalStyles.pageHeaderText}>Scan to pay</Text>
-      </View>
+    <LinearGradient
+      colors={['rgba(250,167,62, 0.2)', 'rgba(250, 167, 62, 0.2)']}
+      start={{x: 1, y: 0}}
+      end={{x: 0, y: 1}}
+      style={styles.container}>
+      <Header scrnName="Scan to pay" />
       <View style={styles.actionBar}>
         <Pressable onPress={handleFlash} style={styles.pressableStyle}>
           <MaterialCommunityIcons
@@ -109,10 +113,9 @@ const PaymentInterface: React.FC<PaymentScreenProps> = ({navigation}) => {
         flashMode={flashMode}
         reactivate={true}
         cameraContainerStyle={styles.cameraContainer}
-        // containerStyle={styles.containerStyle}
       />
       {errorText && <Text style={styles.errorText}>{errorText}</Text>}
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -124,7 +127,7 @@ const styles = StyleSheet.create({
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: backgroundColor,
+    backgroundColor: 'white',
     alignItems: 'center',
   },
   headerStyle: {
@@ -160,7 +163,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconText: {
-    color: 'white',
+    color: 'black',
     fontWeight: '500',
   },
   errorText: {

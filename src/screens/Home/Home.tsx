@@ -1,43 +1,21 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  Pressable,
-} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {
-  backgroundColor,
-  dbUrl,
-  incomeCategories,
-  themeColor,
-} from '../../constants';
-import CircularProgressBar from '../../components/CircleProgressBar';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import EventCard from '../../components/EventCard';
-import {
-  getData,
-  getRealTimeData,
-  getRecentSortedData,
-  getTodayDataa,
-} from './funcs';
 import {ScreenProps, uploadDataType} from '../../types/types';
+import LinearGradient from 'react-native-linear-gradient';
+import Header from '../../components/Header';
+import CircularProgressBar from '../../components/CircleProgressBar';
+import Analysis from '../Analysis/Analysis';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import EventCard from '../../components/EventCard';
+import {FlatList} from 'react-native-gesture-handler';
 import {checkLastTransac} from '../AddExpense/utils';
-import {capitalize} from '../../utils/generalUtils';
-import PopMessageBox from '../../components/PopupBox';
+import {getData, getRecentSortedData, getTodayDataa} from './funcs';
 import {useAuth} from '../AuthFlow/authContext';
 import {useIsFocused} from '@react-navigation/native';
-// import {SafeAreaView} from 'react-native-safe-area-context';
 
 type HomeScreenProps = ScreenProps<'Home'>;
 
 const Home: React.FC<HomeScreenProps> = ({navigation}) => {
-  const [user, initializing] = useAuth();
-  console.log('home user ', initializing);
-  const isFocused = useIsFocused();
   const [totalIncome, setTotalIncome] = useState<number>();
   const [totalExpense, setTotalExpense] = useState<number>();
   const [todayExpense, setTodayExpense] = useState<number>();
@@ -45,8 +23,9 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
   const [events, setEvents] = useState<uploadDataType[] | null | undefined>(
     undefined,
   );
-  const [showPopArray, setShowPopArray] = useState<boolean[]>([]);
-  const tintColor: string = themeColor;
+
+  const [user, initializing] = useAuth();
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     const fnc = async () => {
@@ -74,199 +53,136 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
     fnc();
   }, [isFocused, user]);
 
-  useEffect(() => {
-    if (events) {
-      setShowPopArray(events.map(() => false));
-    }
-  }, [events]);
-
-  // useEffect(() => {
-  //   if (isFocused) console.log('focus chagend');
-  // }, [isFocused]);
-
+  const renderItem = ({item}: {item: uploadDataType}) => (
+    <EventCard item={item} />
+  );
   return (
-    <SafeAreaView>
-      <View style={styles.container}>
-        <View style={styles.headingContainer}>
-          <Text style={styles.header}>One Rupee</Text>
-          <View style={{paddingTop: 50, paddingBottom: 10}}>
-            {totalIncome !== undefined && totalExpense !== undefined ? (
-              <CircularProgressBar
-                totalRupee={parseInt(totalIncome.toString())}
-                expendedRupee={parseInt(totalExpense.toString())}
-                tintColor={tintColor}
+    <LinearGradient
+      style={styles.container}
+      colors={['rgba(250,167,62, 0.2)', '#fff', 'rgba(250, 167, 62, 0.2)']}
+      start={{x: 1, y: 0}}
+      end={{x: 0, y: 1}}>
+      {/* Header */}
+      <Header scrnName="Home" />
+      <View style={{width: '90%'}}>
+        {/* Circular Progress bar */}
+        <View style={styles.circularBarContainer}>
+          {totalIncome !== undefined &&
+          totalIncome !== null &&
+          totalExpense !== undefined &&
+          totalExpense !== null ? (
+            <CircularProgressBar
+              totalRupee={totalIncome}
+              expendedRupee={totalExpense}
+              tintColor="blue"
+            />
+          ) : (
+            <Text>Loading</Text>
+          )}
+        </View>
+        <View style={styles.statusContainer}>
+          <View>
+            <LinearGradient
+              colors={['#FF5733', '#FFC300']} // Define your gradient colors
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 0}}
+              style={styles.stausBox}>
+              <FontAwesome6
+                name="money-check-dollar"
+                color={'white'}
+                size={20}
               />
-            ) : (
-              <Text>Loading.....</Text>
-            )}
-          </View>
-        </View>
-
-        <View
-          style={{display: 'flex', alignItems: 'center', paddingBottom: 20}}>
-          <View style={styles.greetingStyle}>
-            <View style={styles.greetingContainer}>
-              <View style={styles.dataIconDisplay}>
-                <SimpleLineIcons name="wallet" size={30} color={'#fff'} />
-              </View>
-              <Text style={styles.greetingText}>
-                ₹ {todayExpense} spent {'\n'}today
+              <Text style={styles.statusText} numberOfLines={2}>
+                ₹{todayExpense} spent today
               </Text>
-            </View>
-
-            <View style={styles.greetingContainer}>
-              <View style={styles.dataIconDisplay}>
-                <FontAwesome5 name="money-bill" size={30} color={'#fff'} />
-              </View>
-              <Text style={styles.greetingText}>
-                ₹ {todayIncome} gained {'\n'} today
-              </Text>
-            </View>
+            </LinearGradient>
           </View>
-        </View>
-
-        <View style={styles.eventSection}>
-          <View style={styles.eventContainer}>
-            <View style={styles.eventLabelContainer}>
-              <Text style={styles.eventLabel}>Events</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Analysis')}>
-                {/* <TouchableOpacity onPress={() => setShowPop(true)}> */}
-                <Text style={[styles.eventLabel, styles.linkLabel]}>
-                  View all {'>'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView horizontal style={styles.scrollStyle}>
-              {events ? (
-                events.map((event, index) => (
-                  <Pressable
-                    style={{paddingRight: 10}}
-                    key={index}
-                    onPress={() => {
-                      const updatedShowPopArray = [...showPopArray];
-                      updatedShowPopArray[index] = true;
-                      setShowPopArray(updatedShowPopArray);
-                    }}>
-                    <EventCard
-                      type={event.type}
-                      category={capitalize(event.category)}
-                      amount={event.amount}
-                      location={event.location}
-                    />
-                    <PopMessageBox
-                      isVisible={showPopArray[index]}
-                      onClose={() => {
-                        const updatedShowPopArray = [...showPopArray];
-                        updatedShowPopArray[index] = false;
-                        setShowPopArray(updatedShowPopArray);
-                      }}
-                      data={events[index]}
-                    />
-                  </Pressable>
-                ))
-              ) : (
-                <View style={styles.dataNotFound}>
-                  <Text style={styles.dataNotFoundText}>No data Found</Text>
-                </View>
-              )}
-            </ScrollView>
+          <View>
+            <LinearGradient
+              colors={['#FF5733', '#FFC300']} // Define your gradient colors
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 0}}
+              style={styles.stausBox}>
+              <FontAwesome6
+                name="money-check-dollar"
+                color={'white'}
+                size={20}
+              />
+              <Text style={styles.statusText} numberOfLines={2}>
+                ₹{todayIncome} gained today
+              </Text>
+            </LinearGradient>
           </View>
         </View>
       </View>
-    </SafeAreaView>
+      <View style={styles.eventsContainer}>
+        <View style={styles.innerContainer}>
+          <Text style={styles.eventsHeader}>Events</Text>
+          <View style={styles.cardContainer}>
+            <FlatList data={events} renderItem={renderItem} horizontal={true} />
+          </View>
+        </View>
+      </View>
+    </LinearGradient>
   );
 };
 
+export default Home;
+
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: backgroundColor,
     height: '100%',
     width: '100%',
+    alignItems: 'center',
+    backgroundColor: 'white',
   },
-  header: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 22,
-  },
-  headingContainer: {
-    display: 'flex',
+  circularBarContainer: {
     justifyContent: 'center',
-    flexDirection: 'column',
     alignItems: 'center',
-    paddingTop: 25,
-  },
-
-  dataIconDisplay: {
-    height: 56,
-    width: 56,
-    borderRadius: 10,
-    backgroundColor: '#2B2929',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  greetingStyle: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '85%',
     paddingTop: 20,
   },
-  greetingContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  greetingText: {
-    color: '#fff',
-    paddingLeft: 10,
-    fontSize: 15,
-  },
-  eventSection: {
-    backgroundColor: '#202020',
-    height: '100%',
-    width: '100%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    display: 'flex',
-    alignItems: 'center',
-    paddingTop: 10,
-  },
-  eventContainer: {
-    height: '100%',
-    width: '90%',
-  },
-  eventLabelContainer: {
-    display: 'flex',
+  statusContainer: {
     justifyContent: 'space-between',
     alignItems: 'center',
+    display: 'flex',
     flexDirection: 'row',
+    paddingVertical: 10,
   },
-  eventLabel: {
-    fontSize: 20,
-    color: '#fff',
-  },
-  linkLabel: {
-    color: '#FD8D26',
-  },
-  scrollStyle: {
-    flex: 1,
+  stausBox: {
+    height: 86,
+    width: 150,
+    borderRadius: 30,
+    padding: 20,
+    display: 'flex',
     flexDirection: 'row',
-    paddingTop: 15,
-  },
-  dataNotFound: {
-    height: '40%',
-    width: '100%',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
-  dataNotFoundText: {
-    color: 'gray',
+  statusText: {
+    color: 'white',
+    fontFamily: 'Poppins-Bold',
+    paddingLeft: 3,
+  },
+  eventsContainer: {
+    backgroundColor: 'rgba(250,167,62, 0.5)',
+    height: '100%',
+    width: '100%',
+    borderRadius: 20,
+    paddingTop: 10,
+    alignItems: 'center',
+  },
+  eventsHeader: {
+    color: 'black',
     fontSize: 20,
+    fontFamily: 'Poppins-SemiBold',
+  },
+  innerContainer: {
+    width: '90%',
+    height: '100%',
+  },
+  cardContainer: {
+    height: '35%',
+    justifyContent: 'center',
+    width: '100%',
   },
 });
-
-export default Home;

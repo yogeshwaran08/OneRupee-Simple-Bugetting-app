@@ -1,5 +1,5 @@
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "./ScreenTypes";
+import { RootStackParamList } from '../navigation/ScreenTypes';
 
 
 export interface piChartCategoriesType {

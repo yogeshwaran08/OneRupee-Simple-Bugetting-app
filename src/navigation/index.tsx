@@ -18,6 +18,7 @@ import SignUpScreen from '../screens/AuthFlow/SignUpScreen';
 import ResetPassword from '../screens/AuthFlow/ResetPassword';
 import LoginSucess from '../screens/AuthFlow/LoginSucess';
 import {useAuth} from '../screens/AuthFlow/authContext';
+import LogoutScreen from '../screens/AuthFlow/logout';
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 const PaymentStack = createStackNavigator<RootStackParamList>();
@@ -104,6 +105,22 @@ const TabbedNavigator = () => (
         tabBarIcon: ({color, size}) => (
           <FontAwesome6 name="money-bill-transfer" size={size} color={color} />
         ),
+      }}
+    />
+    <Tab.Screen
+      name="LogoutScreen"
+      component={LogoutScreen}
+      options={{
+        tabBarIcon: ({color, size}) => (
+          <FontAwesome6 name="user-circle" size={size} color={color} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="AuthFlow"
+      component={AuthFlowNaivgator}
+      options={{
+        tabBarItemStyle: {display: 'none'},
       }}
     />
   </Tab.Navigator>

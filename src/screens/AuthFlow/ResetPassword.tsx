@@ -25,6 +25,7 @@ import {
 } from 'react-native-gesture-handler';
 import {useToast} from 'react-native-toast-notifications';
 import {resetPassword} from './auth';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 type LoginScreenProps = ScreenProps<'SignUpScreen'>;
 
@@ -101,7 +102,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
               <Animated.View style={animatedStyle}>
                 <InputBox
                   editable={emailState}
-                  iconName="user"
+                  iconName={() => {
+                    return (
+                      <SimpleLineIcons name="user" color={'gray'} size={25} />
+                    );
+                  }}
                   placeholder="Email"
                   multiline={false}
                   text={email}
