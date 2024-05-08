@@ -48,3 +48,12 @@ $ npm run android
 ```
 
 If you face any error on package set up please refer the documentation of the package accordingly. Thankyou..
+
+
+Screenshots
+![WhatsApp Image 2024-05-08 at 20 20 03_f01d38bf](https://github.com/yogeshwaran08/OneRupee-Simple-Bugetting-app/assets/85753695/23a633b1-77af-49e4-a68e-6f1fb028d8bf)
+![WhatsApp Image 2024-05-08 at 20 20 03_90ee4951](https://github.com/yogeshwaran08/OneRupee-Simple-Bugetting-app/assets/85753695/c678772a-ca66-4988-9bf7-b028e3d04403)
+![WhatsApp Image 2024-05-08 at 20 20 04_e4e39682](https://github.com/yogeshwaran08/OneRupee-Simple-Bugetting-app/assets/85753695/9782a9c3-8300-4da5-9649-7673df967d60)
+![WhatsApp Image 2024-05-08 at 20 20 04_a1cce270](https://github.com/yogeshwaran08/OneRupee-Simple-Bugetting-app/assets/85753695/18021ca8-fa35-4b68-b797-c9559de520b0)
+![WhatsApp Image 2024-05-08 at 20 20 05_e4964523](https://github.com/yogeshwaran08/OneRupee-Simple-Bugetting-app/assets/85753695/09953e60-a603-464e-a5d6-b37815862965)
+
